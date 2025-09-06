@@ -5,7 +5,9 @@ from .models import Library
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from django.contrib.auth.views import LoginView, LogoutView
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import user_passes_test
+from django.http import HttpResponse
 
 # Function-based view to list all books
 def list_books(request):
@@ -38,3 +40,34 @@ def is_librarian(user):
 
 def is_member(user):
     return hasattr(user, 'userprofile') and user.userprofile.role == 'Member'
+
+
+# Function to check if the user is an Admin
+def is_admin(user):
+    return user.userprofile.role == 'Admin'
+
+# Function to check if the user is a Librarian
+def is_librarian(user):
+    return user.userprofile.role == 'Librarian'
+
+# Function to check if the user is a Member
+def is_member(user):
+    return user.userprofile.role == 'Member'
+
+
+# Admin view: Only accessible by users with the Admin role
+@user_passes_test(is_admin)
+def admin_view(request):
+    return render(request, 'relationship_app/admin_view.html')
+
+
+# Librarian view: Only accessible by users with the Librarian role
+@user_passes_test(is_librarian)
+def librarian_view(request):
+    return render(request, 'relationship_app/librarian_view.html')
+
+
+# Member view: Only accessible by users with the Member role
+@user_passes_test(is_member)
+def member_view(request):
+    return render(request, 'relationship_app/member_view.html')
