@@ -150,3 +150,11 @@ CSP_SCRIPT_SRC = ("'self'",)
 CSP_STYLE_SRC = ("'self'", 'https://fonts.googleapis.com')  # allow Google Fonts if needed
 CSP_FONT_SRC = ("'self'", 'https://fonts.gstatic.com')      # allow Google Fonts if needed
 CSP_IMG_SRC = ("'self'", 'data:')
+
+# Redirect all HTTP requests to HTTPS (for production)
+SECURE_SSL_REDIRECT = True  # Enforces HTTPS
+
+# HSTS (HTTP Strict Transport Security) configuration
+SECURE_HSTS_SECONDS = 31536000  # 1 year in seconds
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True  # Apply HSTS to all subdomains
+SECURE_HSTS_PRELOAD = True  # Allow preload list inclusion
