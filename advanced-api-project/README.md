@@ -31,3 +31,15 @@ Enabled via:
 - `filterset_fields = ["title", "publication_year", "author", "author__name"]`
 - `search_fields = ["title", "author__name"]`
 - `ordering_fields = ["title", "publication_year", "id"]`
+
+
+## Tests
+Run:
+```bash
+python manage.py test api
+Covers: CRUD on Books, permissions (IsAuthenticated/ReadOnly), filtering (publication_year, author, author__name), search (search over title/author name), and ordering (ordering by fields).
+
+
+## 4) Commit
+```bash
+git add api/test_views.py README.md

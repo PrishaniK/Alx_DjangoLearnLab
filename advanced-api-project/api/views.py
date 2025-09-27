@@ -4,6 +4,7 @@ from .models import Author, Book
 from .serializers import AuthorSerializer, BookSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
+from rest_framework.authentication import BasicAuthentication
 
 from rest_framework import generics           
 from django_filters import rest_framework     
@@ -51,6 +52,7 @@ class CreateView(generics.CreateAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     permission_classes = [IsAuthenticated]
+    authentication_classes = [BasicAuthentication]
 
     def perform_create(self, serializer):
         title = serializer.validated_data.get("title", "").strip()
@@ -61,6 +63,7 @@ class UpdateView(generics.UpdateAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     permission_classes = [IsAuthenticated]
+    authentication_classes = [BasicAuthentication]
 
     def perform_update(self, serializer):
         title = serializer.validated_data.get("title", "").strip()
@@ -71,3 +74,4 @@ class DeleteView(generics.DestroyAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     permission_classes = [IsAuthenticated]
+    authentication_classes = [BasicAuthentication]

@@ -10,13 +10,13 @@ router.register(r"authors", AuthorViewSet, basename="author")
 router.register(r"books", BookViewSet, basename="book")
 
 urlpatterns = [
-    # Router endpoints (ViewSets)
-    path("", include(router.urls)),
-
-    # Generic views (single, clean set)
+    # --- CBVs FIRST to avoid router catching "create" as a pk ---
     path("books/", ListView.as_view(), name="book-list"),
-    path("books/<int:pk>/", DetailView.as_view(), name="book-detail"),
     path("books/create/", CreateView.as_view(), name="book-create"),
-    path("books/update/<int:pk>/", UpdateView.as_view(), name="book-update"),   # contains "books/update"
-    path("books/delete/<int:pk>/", DeleteView.as_view(), name="book-delete"),   # contains "books/delete"
+    path("books/update/<int:pk>/", UpdateView.as_view(), name="book-update"),
+    path("books/delete/<int:pk>/", DeleteView.as_view(), name="book-delete"),
+    path("books/<int:pk>/", DetailView.as_view(), name="book-detail"),
+
+    # Router endpoints AFTER
+    path("", include(router.urls)),
 ]
