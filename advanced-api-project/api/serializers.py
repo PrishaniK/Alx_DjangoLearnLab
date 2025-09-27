@@ -21,7 +21,7 @@ class AuthorSerializer(serializers.ModelSerializer):
     Author with nested books for read/write.
     We accept books WITHOUT 'author' and set author=instance in code.
     """
-    books = BookSerializer(many=True, required=False)
+    books = BookSerializer(many=True, read_only=True)
 
     class Meta:
         model = Author
