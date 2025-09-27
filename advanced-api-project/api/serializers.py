@@ -16,18 +16,12 @@ class BookSerializer(serializers.ModelSerializer):
             )
         return value
 
-class BookInlineSerializer(serializers.ModelSerializer):
-    """Used when nesting under Author; no 'author' field in input."""
-    class Meta:
-        model = Book
-        fields = ["id", "title", "publication_year"]
-
 class AuthorSerializer(serializers.ModelSerializer):
     """
     Author with nested books for read/write.
     We accept books WITHOUT 'author' and set author=instance in code.
     """
-    books = BookInlineSerializer(many=True, required=False)
+    books = BookSerializer(many=True, required=False)
 
     class Meta:
         model = Author
