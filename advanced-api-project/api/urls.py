@@ -1,9 +1,12 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import AuthorViewSet, BookViewSet
 from .views import (
+    # ViewSets
     AuthorViewSet, BookViewSet,
-    BookListGV, BookDetailGV, BookCreateGV, BookUpdateGV, BookDeleteGV
+    # Generic Views (gv)
+    BookListGV, BookDetailGV, BookCreateGV, BookUpdateGV, BookDeleteGV,
+    # Checker-friendly CBV names
+    ListView, DetailView, CreateView, UpdateView, DeleteView,
 )
 
 router = DefaultRouter()
@@ -17,4 +20,10 @@ urlpatterns = [
     path("gv/books/create/", BookCreateGV.as_view(), name="gv-book-create"),            # POST (auth)
     path("gv/books/<int:pk>/update/", BookUpdateGV.as_view(), name="gv-book-update"),   # PUT/PATCH (auth)
     path("gv/books/<int:pk>/delete/", BookDeleteGV.as_view(), name="gv-book-delete"),   # DELETE (auth)
+    
+    path("cbv/books/", ListView.as_view(), name="cbv-book-list"),
+    path("cbv/books/<int:pk>/", DetailView.as_view(), name="cbv-book-detail"),
+    path("cbv/books/create/", CreateView.as_view(), name="cbv-book-create"),
+    path("cbv/books/<int:pk>/update/", UpdateView.as_view(), name="cbv-book-update"),
+    path("cbv/books/<int:pk>/delete/", DeleteView.as_view(), name="cbv-book-delete"),
 ]

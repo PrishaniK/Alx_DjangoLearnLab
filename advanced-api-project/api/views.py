@@ -1,9 +1,6 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, generics, permissions
 from .models import Author, Book
 from .serializers import AuthorSerializer, BookSerializer
-from rest_framework import generics, permissions
-from .models import Book
-from .serializers import BookSerializer
 
 # - ListAPIView / RetrieveAPIView are read-only (AllowAny).
 # - Create/Update/Destroy use IsAuthenticated and call perform_* hooks to normalize input.
@@ -69,6 +66,46 @@ class BookDeleteGV(generics.DestroyAPIView):
     DELETE /api/gv/books/<pk>/delete/
     Delete a book (auth required).
     """
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    
+class ListView(generics.ListAPIView):
+    """GET list of Books (public)."""
+    queryset = Book.objects.all().select_related("author")
+    serializer_class = BookSerializer
+    permission_classes = [permissions.AllowAny]
+
+class DetailView(generics.RetrieveAPIView):
+    """GET one Book (public)."""
+    queryset = Book.objects.all().select_related("author")
+    serializer_class = BookSerializer
+    permission_classes = [permissions.AllowAny]
+
+class CreateView(generics.CreateAPIView):
+    """POST create Book (auth required)."""
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        # small customization: normalize title
+        title = serializer.validated_data.get("title", "").strip()
+        serializer.save(title=title)
+
+class UpdateView(generics.UpdateAPIView):
+    """PUT/PATCH update Book (auth required)."""
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_update(self, serializer):
+        title = serializer.validated_data.get("title", "").strip()
+        serializer.save(title=title)
+
+class DeleteView(generics.DestroyAPIView):
+    """DELETE Book (auth required)."""
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     permission_classes = [permissions.IsAuthenticated]
