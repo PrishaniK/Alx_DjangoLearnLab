@@ -28,4 +28,6 @@ urlpatterns = [
     path("cbv/books/<int:pk>/delete/", DeleteView.as_view(), name="cbv-book-delete"),
     path("books/<int:pk>/update/", UpdateView.as_view(), name="book-update"),
     path("books/<int:pk>/delete/", DeleteView.as_view(), name="book-delete"),
+    path("books/update/<int:pk>/", UpdateView.as_view(), name="book-update-alt"),
+    path("books/delete/<int:pk>/", DeleteView.as_view(), name="book-delete-alt"),
 ]
