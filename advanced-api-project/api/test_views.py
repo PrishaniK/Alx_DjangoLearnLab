@@ -157,3 +157,8 @@ def test_public_list_ok(self):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         years = [b["publication_year"] for b in res.data]
         self.assertEqual(years, sorted(years, reverse=True))
+        
+    def test_session_login_smoke(self):
+        """Smoke test to demonstrate session login (separate test DB is used automatically)."""
+        ok = self.client.login(username="tester", password="pass1234")
+        self.assertTrue(ok)
