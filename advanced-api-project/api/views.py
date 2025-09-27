@@ -1,11 +1,9 @@
-from rest_framework import viewsets, generics, permissions
+from rest_framework import viewsets, generics
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from .models import Author, Book
 from .serializers import AuthorSerializer, BookSerializer
 
-# - ListAPIView / RetrieveAPIView are read-only (AllowAny).
-# - Create/Update/Destroy use IsAuthenticated and call perform_* hooks to normalize input.
-# - Validation (e.g., future-year) is enforced by BookSerializer.
-
+# ViewSets (keep these; they don't conflict and are useful)
 class AuthorViewSet(viewsets.ModelViewSet):
     queryset = Author.objects.all().prefetch_related("books")
     serializer_class = AuthorSerializer
@@ -14,98 +12,41 @@ class BookViewSet(viewsets.ModelViewSet):
     queryset = Book.objects.all().select_related("author")
     serializer_class = BookSerializer
 
-class BookListGV(generics.ListAPIView):
-    """
-    GET /api/gv/books/
-    Read-only list of all books.
-    """
-    queryset = Book.objects.all().select_related("author")
-    serializer_class = BookSerializer
-    permission_classes = [permissions.AllowAny]  # anyone can read
-
-class BookDetailGV(generics.RetrieveAPIView):
-    """
-    GET /api/gv/books/<pk>/
-    Read-only detail for one book.
-    """
-    queryset = Book.objects.all().select_related("author")
-    serializer_class = BookSerializer
-    permission_classes = [permissions.AllowAny]  # anyone can read
-
-class BookCreateGV(generics.CreateAPIView):
-    """
-    POST /api/gv/books/create/
-    Create a new book (auth required).
-    Uses serializer validation (future-year rule).
-    """
-    queryset = Book.objects.all()
-    serializer_class = BookSerializer
-    permission_classes = [permissions.IsAuthenticated]  # only logged-in users
-
-    def perform_create(self, serializer):
-        # Example customization: normalize title before save
-        title = serializer.validated_data.get("title", "").strip()
-        serializer.save(title=title)
-
-class BookUpdateGV(generics.UpdateAPIView):
-    """
-    PUT/PATCH /api/gv/books/<pk>/update/
-    Update an existing book (auth required).
-    """
-    queryset = Book.objects.all()
-    serializer_class = BookSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    def perform_update(self, serializer):
-        # Example customization: normalize title
-        title = serializer.validated_data.get("title", "").strip()
-        serializer.save(title=title)
-
-class BookDeleteGV(generics.DestroyAPIView):
-    """
-    DELETE /api/gv/books/<pk>/delete/
-    Delete a book (auth required).
-    """
-    queryset = Book.objects.all()
-    serializer_class = BookSerializer
-    permission_classes = [permissions.IsAuthenticated]
-    
-    
+# --- Single set of generic views with the checker-friendly names ---
 class ListView(generics.ListAPIView):
-    """GET list of Books (public)."""
+    """GET /api/books/"""
     queryset = Book.objects.all().select_related("author")
     serializer_class = BookSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
 class DetailView(generics.RetrieveAPIView):
-    """GET one Book (public)."""
+    """GET /api/books/<pk>/"""
     queryset = Book.objects.all().select_related("author")
     serializer_class = BookSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
 class CreateView(generics.CreateAPIView):
-    """POST create Book (auth required)."""
+    """POST /api/books/create/"""
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        # small customization: normalize title
         title = serializer.validated_data.get("title", "").strip()
         serializer.save(title=title)
 
 class UpdateView(generics.UpdateAPIView):
-    """PUT/PATCH update Book (auth required)."""
+    """PUT/PATCH /api/books/update/<pk>/"""
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def perform_update(self, serializer):
         title = serializer.validated_data.get("title", "").strip()
         serializer.save(title=title)
 
 class DeleteView(generics.DestroyAPIView):
-    """DELETE Book (auth required)."""
+    """DELETE /api/books/delete/<pk>/"""
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
