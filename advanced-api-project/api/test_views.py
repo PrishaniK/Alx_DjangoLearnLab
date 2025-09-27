@@ -3,13 +3,14 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from rest_framework.test import APIClient
 from rest_framework import status
+from rest_framework.test import APIClient, APITestCase
 
 from .models import Author, Book
 
 User = get_user_model()
 
 
-class BookAPITests(TestCase):
+class BookAPITests(APITestCase):
     """
     Tests cover:
       - Read endpoints (public)
