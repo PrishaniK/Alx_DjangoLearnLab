@@ -1,9 +1,6 @@
-# api/test_views.py
 from django.contrib.auth import get_user_model
-from django.test import TestCase
-from rest_framework.test import APIClient
-from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
+from rest_framework import status
 
 from .models import Author, Book
 
@@ -54,10 +51,10 @@ class BookAPITests(APITestCase):
         # Both support filtering/search/ordering because we enabled them on both.
 
     # ---------- READ (public) ----------
-    def test_public_list_ok(self):
-        res = self.anon.get(self.list_url)
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertGreaterEqual(len(res.data), 3)
+def test_public_list_ok(self):
+    response = self.anon.get(self.list_url)   # was: res = ...
+    self.assertEqual(response.status_code, status.HTTP_200_OK)
+    self.assertGreaterEqual(len(response.data), 3)
 
     def test_public_detail_ok(self):
         res = self.anon.get(f"/api/books/{self.book1.id}/")
@@ -77,13 +74,13 @@ class BookAPITests(APITestCase):
 
     def test_create_ok_when_authenticated(self):
         payload = {
-            "title": "  Clean Coder  ",  # leading/trailing spaces will be trimmed by perform_create
+            "title": "  Clean Coder  ",
             "publication_year": 2011,
             "author": self.author1.id,
         }
-        res = self.auth.post(self.create_url, payload, format="json")
-        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(res.data["title"], "Clean Coder")
+        response = self.auth.post(self.create_url, payload, format="json") 
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["title"], "Clean Coder")
 
     def test_create_rejects_future_year(self):
         payload = {
