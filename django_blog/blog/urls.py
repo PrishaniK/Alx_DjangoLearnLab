@@ -15,6 +15,10 @@ urlpatterns = [
     
     path("post/<int:post_id>/comments/new/", CommentCreateView.as_view(), name="comment-create-alt"),
     
+    path("comment/<int:pk>/update/", CommentUpdateView.as_view(), name="comment-update-alt"),
+    path("comment/<int:pk>/delete/", CommentDeleteView.as_view(), name="comment-delete-alt"),
+    path("post/<int:pk>/comments/new/", CommentCreateView.as_view(), name="comment-create-postpk-alt"),
+    
     path("", PostListView.as_view(), name="post-list"),
     path("", post_list, name="post-list"),
     
@@ -34,4 +38,6 @@ urlpatterns = [
     path("logout/", auth_views.LogoutView.as_view(),                                name="logout"),
     path("register/", register,                                                     name="register"),
     path("profile/",  profile,                                                      name="profile"),
+    
+    
 ]
