@@ -146,3 +146,23 @@ def search(request):
             .distinct()
         )
     return render(request, "blog/search_results.html", {"query": q, "results": results})
+
+class PostByTagListView(ListView):
+    """List posts filtered by a slug-like tag value (uses tag name as slug)."""
+    model = Post
+    template_name = "blog/posts_by_tag.html"
+    context_object_name = "posts"
+
+    def get_queryset(self):
+        tag_slug = self.kwargs.get("tag_slug")
+        return (
+            Post.objects.filter(tags__name__iexact=tag_slug)
+            .select_related("author")
+            .prefetch_related("tags")
+            .distinct()
+        )
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["tag"] = type("T", (), {"name": self.kwargs.get("tag_slug")})()  # lightweight tag-ish object
+        return ctx
