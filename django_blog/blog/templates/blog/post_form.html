@@ -1,0 +1,14 @@
+{% extends "blog/base.html" %}
+{% block title %}{% if object %}Edit{% else %}New{% endif %} Post · My Blog{% endblock %}
+{% block content %}
+  <h2>{% if object %}Edit{% else %}New{% endif %} Post</h2>
+  {% if form.errors %}
+    <p style="color:crimson;">Please fix the errors below.</p>
+  {% endif %}
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">{% if object %}Save{% else %}Create{% endif %}</button>
+    <a href="{% if object %}{% url 'post-detail' object.pk %}{% else %}{% url 'post-list' %}{% endif %}">Cancel</a>
+  </form>
+{% endblock %}

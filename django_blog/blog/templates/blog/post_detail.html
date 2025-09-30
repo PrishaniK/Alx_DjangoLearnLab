@@ -1,0 +1,18 @@
+{% extends "blog/base.html" %}
+{% block title %}{{ post.title }} · My Blog{% endblock %}
+{% block content %}
+  <article>
+    <h2>{{ post.title }}</h2>
+    <p class="meta">by {{ post.author.username }} · {{ post.published_date|date:"M j, Y H:i" }}</p>
+    <div>{{ post.content|linebreaks }}</div>
+  </article>
+
+  {% if request.user.is_authenticated and request.user == post.author %}
+    <p>
+      <a href="{% url 'post-edit' post.pk %}">Edit</a> ·
+      <a href="{% url 'post-delete' post.pk %}">Delete</a>
+    </p>
+  {% endif %}
+
+  <p><a href="{% url 'post-list' %}">← Back to posts</a></p>
+{% endblock %}
