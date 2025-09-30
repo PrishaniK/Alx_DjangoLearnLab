@@ -1,0 +1,15 @@
+{% extends "blog/base.html" %}
+{% block title %}{% if object %}Edit Comment{% else %}New Comment{% endif %} · My Blog{% endblock %}
+{% block content %}
+  <h2>{% if object %}Edit Comment{% else %}New Comment{% endif %}</h2>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">{% if object %}Save{% else %}Post{% endif %}</button>
+    {% if object %}
+      <a href="{% url 'post-detail' object.post.pk %}">Cancel</a>
+    {% else %}
+      <a href="javascript:history.back()">Cancel</a>
+    {% endif %}
+  </form>
+{% endblock %}

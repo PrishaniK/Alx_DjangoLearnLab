@@ -7,6 +7,10 @@ from .forms import RegistrationForm, ProfileForm, PostForm
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.shortcuts import get_object_or_404
+from django.urls import reverse
+from .models import Post, Comment
+from .forms import CommentForm
 
 def post_list(request):
     posts = Post.objects.select_related("author").all()
@@ -79,3 +83,42 @@ class PostDeleteView(LoginRequiredMixin, AuthorRequiredMixin, DeleteView):
     model = Post
     template_name = "blog/post_confirm_delete.html"
     success_url = reverse_lazy("post-list")
+    
+    
+class CommentAuthorRequiredMixin(UserPassesTestMixin):
+    def test_func(self):
+        return self.get_object().author == self.request.user
+
+class CommentCreateView(LoginRequiredMixin, CreateView):
+    model = Comment
+    form_class = CommentForm
+    template_name = "blog/comment_form.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        self.post_obj = get_object_or_404(Post, pk=self.kwargs["post_id"])
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        comment = form.save(commit=False)
+        comment.post = self.post_obj
+        comment.author = self.request.user
+        comment.save()
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse("post-detail", args=[self.post_obj.pk])
+
+class CommentUpdateView(LoginRequiredMixin, CommentAuthorRequiredMixin, UpdateView):
+    model = Comment
+    form_class = CommentForm
+    template_name = "blog/comment_form.html"
+
+    def get_success_url(self):
+        return reverse("post-detail", args=[self.object.post.pk])
+
+class CommentDeleteView(LoginRequiredMixin, CommentAuthorRequiredMixin, DeleteView):
+    model = Comment
+    template_name = "blog/comment_confirm_delete.html"
+
+    def get_success_url(self):
+        return reverse_lazy("post-detail", args=[self.object.post.pk])
