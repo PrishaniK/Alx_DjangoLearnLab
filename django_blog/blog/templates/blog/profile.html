@@ -1,0 +1,15 @@
+{% extends "blog/base.html" %}
+{% block title %}Profile · My Blog{% endblock %}
+{% block content %}
+  <h2>Your Profile</h2>
+  {% if messages %}
+    <ul>
+      {% for m in messages %}<li>{{ m }}</li>{% endfor %}
+    </ul>
+  {% endif %}
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save changes</button>
+  </form>
+{% endblock %}
