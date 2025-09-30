@@ -138,13 +138,11 @@ def search(request):
     results = []
     if q:
         results = (
-            Post.objects.select_related("author")
-            .prefetch_related("tags")
-            .filter(
-                Q(title__icontains=q)
-                | Q(content__icontains=q)
-                | Q(tags__name__icontains=q)
+            Post.objects.filter(
+                Q(title__icontains=q) | Q(content__icontains=q) | Q(tags__name__icontains=q)
             )
+            .select_related("author")
+            .prefetch_related("tags")
             .distinct()
         )
     return render(request, "blog/search_results.html", {"query": q, "results": results})
