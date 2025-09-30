@@ -1,0 +1,21 @@
+{% extends "blog/base.html" %}
+{% load static %}
+{% block title %}Home · My Blog{% endblock %}
+
+{% block content %}
+  {% if posts %}
+    <ul class="post-list">
+      {% for post in posts %}
+        <li class="post-item">
+          <h2>{{ post.title }}</h2>
+          <p class="meta">
+            by {{ post.author.username }} · {{ post.published_date|date:"M j, Y H:i" }}
+          </p>
+          <p>{{ post.content|truncatewords:30 }}</p>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No posts yet.</p>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,32 @@
+<!-- django_blog/blog/templates/blog/base.html -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>{% block title %}My Blog{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'blog/styles.css' %}">
+  </head>
+  <body>
+    <header>
+      <h1><a href="{% url 'post-list' %}">My Blog</a></h1>
+      <nav>
+        {% if request.user.is_authenticated %}
+          <span>Hi, {{ request.user.username }}</span>
+          <a href="#">Profile</a>
+          <a href="#">Logout</a>
+        {% else %}
+          <a href="#">Login</a>
+          <a href="#">Register</a>
+        {% endif %}
+      </nav>
+    </header>
+
+    <main>
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+      <small>&copy; {{ now|date:"Y" }} My Blog</small>
+    </footer>
+  </body>
+</html>
