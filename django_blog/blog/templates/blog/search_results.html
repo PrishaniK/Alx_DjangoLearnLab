@@ -1,0 +1,28 @@
+{% extends "blog/base.html" %}
+{% block title %}Search{% if query %}: {{ query }}{% endif %} · My Blog{% endblock %}
+{% block content %}
+  <h2>Search{% if query %}: “{{ query }}”{% endif %}</h2>
+  {% if query and results %}
+    <ul class="post-list">
+      {% for post in results %}
+        <li class="post-item">
+          <h3><a href="{% url 'post-detail' post.pk %}">{{ post.title }}</a></h3>
+          <p class="meta">by {{ post.author.username }} · {{ post.published_date|date:"M j, Y H:i" }}</p>
+          {% if post.tags.all %}
+            <p>
+              <strong>Tags:</strong>
+              {% for t in post.tags.all %}
+                <a href="{% url 'posts-by-tag' t.name %}">{{ t.name }}</a>{% if not forloop.last %}, {% endif %}
+              {% endfor %}
+            </p>
+          {% endif %}
+          <p>{{ post.content|truncatewords:30 }}</p>
+        </li>
+      {% endfor %}
+    </ul>
+  {% elif query %}
+    <p>No results.</p>
+  {% else %}
+    <p>Type a query in the search box.</p>
+  {% endif %}
+{% endblock %}

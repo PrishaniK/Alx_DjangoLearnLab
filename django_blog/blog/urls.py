@@ -6,6 +6,7 @@ from .views import (
     PostListView, PostDetailView, PostCreateView, PostUpdateView, PostDeleteView,
     register, profile,
 )
+from .views import posts_by_tag, search
 
 urlpatterns = [
     
@@ -38,6 +39,9 @@ urlpatterns = [
     path("logout/", auth_views.LogoutView.as_view(),                                name="logout"),
     path("register/", register,                                                     name="register"),
     path("profile/",  profile,                                                      name="profile"),
+    
+    path("tags/<str:tag_name>/", posts_by_tag, name="posts-by-tag"),
+    path("search/", search, name="search"),
     
     
 ]

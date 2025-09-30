@@ -1,0 +1,18 @@
+{% extends "blog/base.html" %}
+{% block title %}Tag: {{ tag.name }} · My Blog{% endblock %}
+{% block content %}
+  <h2>Posts tagged “{{ tag.name }}”</h2>
+  {% if posts %}
+    <ul class="post-list">
+      {% for post in posts %}
+        <li class="post-item">
+          <h3><a href="{% url 'post-detail' post.pk %}">{{ post.title }}</a></h3>
+          <p class="meta">by {{ post.author.username }} · {{ post.published_date|date:"M j, Y H:i" }}</p>
+          <p>{{ post.content|truncatewords:30 }}</p>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No posts for this tag yet.</p>
+  {% endif %}
+{% endblock %}

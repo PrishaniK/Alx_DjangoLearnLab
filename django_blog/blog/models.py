@@ -16,6 +16,7 @@ class Post(models.Model):
         on_delete=models.CASCADE,
         related_name="posts",
     )
+    tags = models.ManyToManyField("Tag", related_name="posts", blank=True)
 
     class Meta:
         ordering = ["-published_date"]
@@ -36,3 +37,14 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"Comment by {self.author} on {self.post}"
+    
+
+
+class Tag(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+
+    class Meta:
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.name

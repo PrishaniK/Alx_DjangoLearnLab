@@ -9,8 +9,9 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
-from .models import Post, Comment
+from .models import Post, Comment, Tag
 from .forms import CommentForm
+from django.db.models import Q
 
 def post_list(request):
     posts = Post.objects.select_related("author").all()
@@ -24,7 +25,7 @@ def register(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Account created. You can log in now.")
-            return redirect("login")  # name provided in urls
+            return redirect("login") 
     else:
         form = RegistrationForm()
     return render(request, "blog/register.html", {"form": form})
@@ -44,9 +45,9 @@ def profile(request):
 
 class PostListView(ListView):
     model = Post
-    template_name = "blog/post_list.html"   # reuses your existing list template
+    template_name = "blog/post_list.html"   
     context_object_name = "posts"
-    paginate_by = 10  # optional
+    paginate_by = 10 
 
 class PostDetailView(DetailView):
     model = Post
@@ -122,3 +123,28 @@ class CommentDeleteView(LoginRequiredMixin, CommentAuthorRequiredMixin, DeleteVi
 
     def get_success_url(self):
         return reverse_lazy("post-detail", args=[self.object.post.pk])
+    
+def posts_by_tag(request, tag_name):
+    tag = get_object_or_404(Tag, name__iexact=tag_name)
+    posts = (
+        Post.objects.select_related("author")
+        .prefetch_related("tags")
+        .filter(tags=tag)
+    )
+    return render(request, "blog/posts_by_tag.html", {"tag": tag, "posts": posts})
+
+def search(request):
+    q = request.GET.get("q", "").strip()
+    results = []
+    if q:
+        results = (
+            Post.objects.select_related("author")
+            .prefetch_related("tags")
+            .filter(
+                Q(title__icontains=q)
+                | Q(content__icontains=q)
+                | Q(tags__name__icontains=q)
+            )
+            .distinct()
+        )
+    return render(request, "blog/search_results.html", {"query": q, "results": results})
