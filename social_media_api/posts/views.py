@@ -1,4 +1,5 @@
 from rest_framework import viewsets, permissions, filters
+from rest_framework import generics
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.authentication import TokenAuthentication
 from django.shortcuts import get_object_or_404
@@ -52,3 +53,15 @@ class CommentViewSet(viewsets.ModelViewSet):
         # expects {"post": <post_id>, "content": "..."}
         serializer.save(author=self.request.user)
 
+class FeedView(generics.ListAPIView):
+    """
+    GET /api/feed/  (Token auth)
+    Returns posts authored by users current user follows, newest first.
+    """
+    serializer_class = PostSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        following_qs = self.request.user.following.all() 
+        return Post.objects.all().filter(author__in=following_qs).order_by("-created_at")
