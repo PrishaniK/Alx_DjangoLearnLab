@@ -4,9 +4,13 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.authentication import TokenAuthentication
 from django.shortcuts import get_object_or_404
 
-from .models import Post, Comment
+from .models import Post, Comment, Like
 from .serializers import PostSerializer, CommentSerializer
 from .permissions import IsOwnerOrReadOnly
+from notifications.utils import create_notification
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status, permissions
 
 
 class DefaultPagination(PageNumberPagination):
@@ -65,3 +69,35 @@ class FeedView(generics.ListAPIView):
     def get_queryset(self):
         following_users = self.request.user.following.all()
         return Post.objects.filter(author__in=following_users).order_by("-created_at")
+    
+
+
+class LikePostView(APIView):
+    """
+    POST /api/posts/<int:pk>/like/
+    """
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, pk):
+        post = get_object_or_404(Post, pk=pk)
+        like, created = Like.objects.get_or_create(post=post, user=request.user)
+        if not created:
+            return Response({"detail": "Already liked."}, status=status.HTTP_200_OK)
+        # notify post author (avoid self-notify)
+        if post.author_id != request.user.id:
+            create_notification(recipient=post.author, actor=request.user, verb="liked your post", target=post)
+        return Response({"detail": "Liked."}, status=status.HTTP_201_CREATED)
+
+
+class UnlikePostView(APIView):
+    """
+    POST /api/posts/<int:pk>/unlike/
+    """
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, pk):
+        post = get_object_or_404(Post, pk=pk)
+        Like.objects.filter(post=post, user=request.user).delete()
+        return Response({"detail": "Unliked."}, status=status.HTTP_200_OK)

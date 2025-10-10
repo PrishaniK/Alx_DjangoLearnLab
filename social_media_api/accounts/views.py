@@ -9,6 +9,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import generics
 
 from .serializers import RegisterSerializer, LoginSerializer, ProfileSerializer
+from notifications.utils import create_notification
 
 CustomUser = get_user_model()
 
@@ -70,9 +71,12 @@ class FollowUserView(APIView):
         target = get_object_or_404(CustomUser, pk=user_id)
         if target == request.user:
             return Response({"detail": "You cannot follow yourself."}, status=status.HTTP_400_BAD_REQUEST)
-        # key line for checker:
-        request.user.following.add(target)    # <-- contains "following.add("
+
+        request.user.following.add(target)   
+        if target.id != request.user.id:
+            create_notification(recipient=target, actor=request.user, verb="followed you", target=target)
         return Response({"detail": f"Now following {target.username}."}, status=status.HTTP_200_OK)
+
 
 
 class UnfollowUserView(APIView):
