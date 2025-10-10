@@ -11,6 +11,9 @@ class User(AbstractUser):
     """
     bio = models.TextField(blank=True)
     profile_picture = models.URLField(blank=True)
+    profile_image = models.ImageField(           
+        upload_to="profiles/", blank=True, null=True
+    )
     followers = models.ManyToManyField(
         "self",
         symmetrical=False,
