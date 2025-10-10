@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import RegisterView, LoginView, ProfileView, FollowUserView, UnfollowUserView
+from .views import UsersListView
 
 urlpatterns = [
     path("register", RegisterView.as_view(), name="register"),
@@ -12,4 +13,6 @@ urlpatterns = [
     
     path("follow/<int:user_id>/",   FollowUserView.as_view(),   name="follow-user"),
     path("unfollow/<int:user_id>/", UnfollowUserView.as_view(), name="unfollow-user"),
+    
+    path("users/", UsersListView.as_view(), name="users-list"),
 ]
