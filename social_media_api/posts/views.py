@@ -54,8 +54,11 @@ class CommentViewSet(viewsets.ModelViewSet):
     pagination_class = DefaultPagination
 
     def perform_create(self, serializer):
-        # expects {"post": <post_id>, "content": "..."}
-        serializer.save(author=self.request.user)
+        comment = serializer.save(author=self.request.user)
+        # Notify the post author (avoid self-notify)
+        post = comment.post
+        if post.author_id != self.request.user.id:
+            create_notification(recipient=post.author, actor=self.request.user, verb="commented on your post", target=post)
 
 class FeedView(generics.ListAPIView):
     """
@@ -84,11 +87,9 @@ class LikePostView(APIView):
         like, created = Like.objects.get_or_create(post=post, user=request.user)
         if not created:
             return Response({"detail": "Already liked."}, status=status.HTTP_200_OK)
-        # notify post author (avoid self-notify)
         if post.author_id != request.user.id:
             create_notification(recipient=post.author, actor=request.user, verb="liked your post", target=post)
         return Response({"detail": "Liked."}, status=status.HTTP_201_CREATED)
-
 
 class UnlikePostView(APIView):
     """

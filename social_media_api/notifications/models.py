@@ -10,14 +10,12 @@ class Notification(models.Model):
     actor = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="actor_notifications"
     )
-    verb = models.CharField(max_length=100)  # e.g., "followed you", "liked your post", "commented on your post"
-
-    # Generic target (post, comment, like, user, etc.)
+    verb = models.CharField(max_length=100)
+    # target (generic)
     target_content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True, blank=True)
     target_object_id = models.PositiveIntegerField(null=True, blank=True)
     target = GenericForeignKey("target_content_type", "target_object_id")
-
-    timestamp = models.DateTimeField(auto_now_add=True)
+    timestamp = models.DateTimeField(auto_now_add=True)  # <-- timestamp
     unread = models.BooleanField(default=True)
 
     class Meta:
